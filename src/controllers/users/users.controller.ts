@@ -12,6 +12,8 @@ import {
 import { UsersService } from '../../services/users/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { created, ok } from 'src/helper/http';
+import { ParseIntPipe } from 'src/pipes/parse-int.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -19,17 +21,20 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    const newUser = this.usersService.create(createUserDto);
+    return created(newUser);
   }
 
   @Get()
   findAll() {
-    return this.usersService.findAll();
+    const users = this.usersService.findAll();
+    return ok(users);
   }
 
-  @Get('/:id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @Get(':id')
+  findOne(@Param('id', new ParseIntPipe()) id: string) {
+    const user = this.usersService.findOne(+id);
+    return ok(user);
   }
 
   @Patch(':id')
